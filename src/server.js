@@ -1,10 +1,14 @@
 const express = require('express')
 const server = express()
 
+//Catch db
+const db = require("./database/db")
 
 //congurar pasta public
 server.use(express.static("public"))
 
+//Req.body
+server.use(express.urlencoded({ extended: true }))
 
 
 //Nunjucks
@@ -22,12 +26,70 @@ server.get('/', (req, res) => {
 })
 
 server.get('/create-point', (req, res) => {
+  //console.log(req.query)
+
   return res.render('create-point.html')
 })
 
 
+server.post('/savepoint', (req, res) => {
+  //console.log(req.body)
+  //insert data on bd
+
+  const query = `
+   INSERT INTO places (
+     name,
+     image,
+     addres,
+     addres2,
+     state,
+     city,
+     items
+   ) VALUES (?,?,?,?,?,?,?);
+ `
+  const values = [
+    req.body.name,
+    req.body.image,
+    req.body.addres,
+    req.body.addres2,
+    req.body.state,
+    req.body.city,
+    req.body.items
+  ]
+  function afterInsertData(err) {
+    if (err) {
+      console.log(err)
+      return res.send('Erro no cadastro')
+    }
+
+    console.log("Cadastrado com sucesso")
+    console.log(this)
+
+    return res.render('create-point.html', { saved: true })
+  }
+  db.run(query, values, afterInsertData)
+
+
+})
+
+
 server.get('/search', (req, res) => {
-  return res.render('search-results.html')
+
+  const search = req.query.search
+
+  if (search == "") {
+    return res.render('search-results.html', { total: 0 })
+  }
+
+
+
+  db.all(`SELECT * FROM places WHERE city LIKE '%${search}%'`, function (err, rows) {
+    if (err) {
+      return console.log(err)
+    }
+    const total = rows.length
+    return res.render('search-results.html', { places: rows, total })
+  })
 })
 
 //Start Server

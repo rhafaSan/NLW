@@ -51,9 +51,6 @@ for(const item of itemsToCollect){
 
 const collectedItems = document.querySelector("input[name=items]")
 
-
-
-
 let selectedItems = []
 
 
@@ -74,7 +71,6 @@ function handleSelectedItem(e){
       const itemIsDifferent = item != itemId
       return itemIsDifferent
     })
-    
        selectedItems = filteredItems
   }else{
     //Add to selection
