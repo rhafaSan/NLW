@@ -78,6 +78,11 @@ function handleSelectedItem(e){
   }
   
   collectedItems.value = selectedItems
+}
 
-
+function errorDetected(err){
+  if(err){
+    console.log(err)
+    alert("Erro no cadastro")
+  }
 }
